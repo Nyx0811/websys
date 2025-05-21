@@ -1,0 +1,290 @@
+body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      background-color: #ffffff;
+    }
+
+    .sidebar {
+      background-color: #00a9c9;
+      width: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      height: 100vh; 
+    }
+
+    .icon {
+      font-size: 28px;
+      color: white;
+      cursor: pointer;
+      width: 40px;
+      padding: 10px;
+      margin-top: 15px;
+      margin-bottom: 0;
+      border-radius: 10px;
+    }
+
+    .icon:hover {
+      background-color: #2cdcff;
+    }
+
+    .main {
+      flex: 1;
+      padding: 20px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid black;
+      padding-bottom: 10px;
+    }
+
+    .top-bar h2 {
+      margin: 0;
+      font-size: 28px;
+      text-decoration: underline;
+    }
+
+    .buttons button {
+      margin-left: 10px;
+      padding: 5px 10px;
+      cursor: pointer;
+      background-color: #00a9c9;
+      color: rgb(255, 255, 255);
+      border: none; /* add and archive button abpve */
+    }
+    
+    .buttons button:hover {
+        background-color: #007b8f; /* effect ng buttons  */
+    }
+
+
+    .subtitle-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      flex-wrap: wrap; /* Allow wrapping for filters */
+      gap: 10px; /* Add gap for wrapped items */
+    }
+
+    .subtitle {
+      display: flex;
+      align-items: center;
+      gap: 15px; /* Adjusted gap for better spacing with more filters */
+    }
+     .subtitle h3 { /* View Inventory heading below ng Inventory */
+        margin: 0;
+        font-size: 20px; 
+        font-weight: bold;
+    }
+
+    .subtitle label {
+      margin-left: 10px;
+      font-weight: normal; /* Original did not specify bold, keeping it normal */
+    }
+    .subtitle select { /* Style for select dropdowns */
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px; /* Optional: for consistency */
+        font-family: Arial, sans-serif;
+    }
+
+    .searchNdatetime {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .search-box {
+      padding: 5px;
+      border: 1px solid #ccc; /* Added border for consistency */
+      border-radius: 4px; /* Optional */
+    }
+
+    .date-time {
+      background-color: #00a9c9;
+      color: rgb(255, 255, 255);
+      padding: 5px 10px;
+      border-radius: 4px; /* Optional */
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: #f5f5f5;
+    }
+
+    thead {
+      background-color: #d0e8f2;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+
+    /* Limit the width of the Description column */
+    td:nth-child(3), th:nth-child(3) { /* Assuming Description is 3rd */
+      max-width: 200px;
+      word-wrap: break-word;
+      white-space: normal;
+    }
+    
+    /* Styles for table action buttons, adapted from user's .archive-btn */
+    .action-btn {
+        padding: 5px 10px;
+        margin-right: 5px;
+        border: 1px solid #000000; /* Using same border as other buttons */
+        border-radius: 4px; /* Slight rounding for consistency */
+        cursor: pointer;
+        font-size: 14px;
+        color: rgb(255, 255, 255); /* White text */
+    }
+    .edit-btn {
+        background-color: #729762; /* Green for edit */
+    }
+    .edit-btn:hover {
+        background-color: #4cae4c; /* Darker green */
+    }
+    .archive-btn-table { /* Differentiate from a general .archive-btn if any */
+        background-color: #c23b22; /* Red for archive in table */
+    }
+    .archive-btn-table:hover {
+        background-color: #c9302c; /* Darker red */
+    }
+    /* User's .archive-btn, if used elsewhere with its original styling */
+    .archive-btn {
+      background-color: #d0e8f2; /* Light blue from thead */
+      color: #333; /* Darker text for readability */
+      border: 1px solid #ccc; /* Border for definition */
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+     .archive-btn:hover {
+        background-color: #b0d8e2; /* Slightly darker */
+    }
+
+
+    /* Styles for the Modal - Adapted to User's Theme */
+    .modal {
+      display: none; 
+      position: fixed; 
+      z-index: 1000; 
+      left: 0;
+      top: 0;
+      width: 100%; 
+      height: 100%; 
+      overflow: auto; 
+      background-color: rgba(0,0,0,0.4); 
+      padding-top: 50px;
+    }
+
+    .modal-content {
+      background-color: #ffffff; /* White background, as per body */
+      margin: 5% auto; 
+      padding: 20px;
+      border: 2px solid #0098a6; /* Black border, similar to top-bar buttons */
+      width: 60%; 
+      max-width: 650px; 
+      border-radius: 8px; /* Consistent rounding */
+      font-family: Arial, sans-serif;
+    }
+    
+    .modal-content h3 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: #0098a6;
+        text-align: left;
+        font-size: 24px; /* Slightly smaller than main page title */
+    }
+
+    .close-btn {
+      color: #888; /* Grey close button */
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .close-btn:hover,
+    .close-btn:focus {
+      color: #000000; /* Black on hover */
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .modal-content form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px; 
+    }
+    .modal-content form label {
+      margin-top: 5px; 
+      font-weight: bold; /* Labels are typically bold */
+      color: #000000; /* Black labels */
+    }
+    .modal-content form input[type="text"],
+    .modal-content form input[type="number"],
+    .modal-content form input[type="date"],
+    .modal-content form textarea {
+      padding: 8px; /* Slightly less padding than table cells */
+      margin-top: 2px;
+      border: 1px solid #ccc; /* Standard ccc border */
+      border-radius: 4px;
+      box-sizing: border-box;
+      width: 100%;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+    }
+     .modal-content form textarea {
+        min-height: 80px;
+        resize: vertical;
+     }
+
+    .modal-content form .form-group {
+      display: flex;
+      gap: 15px; 
+      margin-top: 5px;
+    }
+    .modal-content form .form-group > div {
+        flex: 1; 
+    }
+    .modal-content form .form-group label {
+        margin-top: 0;
+    }
+
+    .modal-content form .radio-group {
+        display: flex;
+        gap: 10px; 
+        align-items: center;
+        padding: 5px 0;
+    }
+    .modal-content form .radio-group label {
+        font-weight: normal; 
+        margin-top: 0; 
+        display: flex;
+        align-items: center;
+        color: #000000;
+    }
+     .modal-content form .radio-group input[type="radio"] {
+        margin-right: 5px;
+    }
+
+    .modal-content form button[type="submit"] {
+      margin-top: 15px;
+      padding: 5px 10px; /* Matching other buttons */
+      background-color: #00a9c9; /* Theme color */
+      color: rgb(255, 255, 255); /* White text */
+      border: 1px solid #00a9c9; /* Black border */
+      cursor: pointer;
+      border-radius: 0; /* Original buttons had no explicit radius, so keeping it sharp */
+      font-size: 20px; /* Slightly larger for a primary action */
+    }
+    .modal-content form button[type="submit"]:hover {
+      background-color: #007b8f; 
+    }

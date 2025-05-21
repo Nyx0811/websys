@@ -1,0 +1,214 @@
+/* Styles from Inventory.css that Archive.css should mirror for a "twin" look */
+/* Basic body, sidebar, main layout */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    background-color: #ffffff;
+}
+.sidebar {
+    background-color: #00a9c9;
+    width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    height: 100vh;
+}
+.icon {
+    font-size: 28px;
+    color: white;
+    cursor: pointer;
+    width: 40px;
+    padding: 10px;
+    margin-top: 15px;
+    margin-bottom: 0;
+    border-radius: 10px;
+}
+.icon:hover {
+    background-color: #2cdcff;
+}
+.main {
+    flex: 1;
+    padding: 20px;
+}
+
+/* Top bar */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid black;
+    padding-bottom: 10px;
+}
+.top-bar h2 {
+    margin: 0;
+    font-size: 28px;
+    text-decoration: underline;
+}
+/* Buttons in the top bar */
+.top-bar .buttons button { /* Ensure this targets your navigation buttons */
+    margin-left: 10px;
+    padding: 5px 10px;
+    cursor: pointer;
+    background-color: #00a9c9;
+    color: rgb(255, 255, 255);
+    border: none; /* As per INVDASH.html's Inventory.css for these buttons */
+}
+.top-bar .buttons button:hover {
+    background-color: #007b8f;
+}
+
+/* Subtitle container for filters and search */
+.subtitle-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.subtitle {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.subtitle h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+}
+.subtitle label {
+    margin-left: 10px;
+    font-weight: normal;
+}
+.subtitle select { /* For Category and Campus dropdowns */
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: Arial, sans-serif;
+    margin-left: 5px;
+}
+
+/* Search and Datetime */
+.searchNdatetime { /* Class used in INVDASH.html */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.search-box {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.date-time {
+    background-color: #00a9c9;
+    color: rgb(255, 255, 255);
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+/* Table styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #f5f5f5; /* From Inventory.css */
+}
+thead {
+    background-color: #d0e8f2; /* From Inventory.css */
+}
+th, td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: center;
+}
+td:nth-child(3), th:nth-child(3) { /* Description column width */
+    max-width: 200px;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+/* Action buttons in table */
+.action-btn {
+    padding: 5px 10px;
+    margin-right: 5px;
+    border: 1px solid #000000; 
+    border-radius: 4px; 
+    cursor: pointer;
+    font-size: 14px;
+    color: rgb(255, 255, 255); 
+}
+.restore-btn { /* Specific style for restore button */
+    background-color: #007bff; /* Blue */
+    /* It will inherit other .action-btn styles if both classes are applied */
+}
+.restore-btn:hover {
+    background-color: #0056b3; /* Darker blue */
+}
+
+/* Your existing .unarchive-btn from Archive.css - you can rename or adapt this to .restore-btn */
+/* .unarchive-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+.unarchive-btn:hover {
+    background-color: #218838;
+} */
+
+    /* Styles to make it a "twin" of INVDASH.html, supplementing Archive.css */
+    /* These can be moved to Archive.css if preferred */
+
+    /* Sidebar, main, top-bar, buttons, subtitle-container, table should largely match INVDASH via Archive.css if it's similar */
+    /* Ensuring .action-btn styles are available for the restore button */
+    .action-btn { /* Copied from Inventory.css for base styling of action buttons */
+        padding: 5px 10px;
+        margin-right: 5px;
+        border: 1px solid #000000; 
+        border-radius: 4px; 
+        cursor: pointer;
+        font-size: 14px;
+        color: rgb(255, 255, 255); 
+    }
+    .restore-btn {
+        background-color: #007bff; /* Blue for restore */
+        /* Inherits other .action-btn properties if .action-btn is also applied */
+    }
+    .restore-btn:hover {
+        background-color: #0056b3; /* Darker blue */
+    }
+
+    /* Filter styling to match INVDASH's select dropdowns */
+    .subtitle select {
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-family: Arial, sans-serif;
+        margin-left: 5px; /* Space after label */
+    }
+    .subtitle label { /* Ensure labels are styled consistently */
+        margin-left: 10px; /* As in INVDASH */
+        font-weight: normal;
+    }
+     .subtitle h3 { /* For "Archived Items" heading */
+        margin: 0;
+        font-size: 20px; 
+        font-weight: bold;
+    }
+    /* Top bar buttons for navigation - ensuring they look like INVDASH */
+    .top-bar .buttons button#viewActiveBtn,
+    .top-bar .buttons button#addItemBtnFromArchive { /* More specific IDs */
+      margin-left: 10px;
+      padding: 5px 10px;
+      cursor: pointer;
+      background-color: #00a9c9; /* Color from INVDASH buttons */
+      color: rgb(255, 255, 255);
+      border: none; /* Original INVDASH buttons had no border here */
+    }
+    .top-bar .buttons button#viewActiveBtn:hover,
+    .top-bar .buttons button#addItemBtnFromArchive:hover {
+        background-color: #007b8f; /* Hover color from INVDASH */
+    }

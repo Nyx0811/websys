@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Items</title>
+  <link rel="Stylesheet" href="../Stylesheet/Inv/Add.css">
+  <script src="https://kit.fontawesome.com/f543d9f8e5.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="icon" id="backBtn"><i class="fa-solid fa-arrow-left fa-2x" style="color: #ffffff;"></i></div>
+    <div class="icon"><i class="fa-solid fa-clock-rotate-left fa-xl" style="color: #ffffff;"></i></div>
+    <div class="icon" id="notif"><i class="fa-regular fa-bell fa-xl" style="color: #ffffff;"></i></div>
+    <div class="icon"><i class="fa-solid fa-user fa-xl" style="color: #ffffff;"></i></div>
+  </div>
+  <div class="main">
+    <div class="top-bar">
+      <h2>Inventory</h2>
+      <div class="buttons">
+        <button id="addBtn">Add Item</button>
+        <button id="updBtn">Update Inventory</button>
+        <button id="archBtn">Archive Inventory</button>
+      </div>
+    </div>
+
+    <div class="datetime" id="datetime">Loading date and time..</div>
+
+    <div class="form-container">
+      <div class="form-box">
+        <h3>Add Items</h3>
+        <div class="form-group form-row">
+          <input type="text" placeholder="Item Name">
+          <input type="text" placeholder="Inventory ID (View Only)" disabled>
+        </div>
+
+        <div class="form-group">
+          <label>Category:</label>
+          <div class="category-options">
+            <label><input type="radio" name="category" value="medicine" checked> Medicine</label>
+            <label><input type="radio" name="category" value="medical supplies"> Medical Supplies</label>
+            <label><input type="radio" name="category" value="medical equipments"> Medical Equipments</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <textarea placeholder="Description" rows="4"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Dosage:</label>
+          <input type="text" placeholder="Enter Dosage: (e.g. 500mg capsule or 5ml syrup)" id="dosageInput">
+        </div>
+
+        <div class="form-label-row">
+          <label>Quantity</label>
+          <label>Label</label>
+        </div>
+        <div class="form-group form-row">
+          <input type="number" placeholder="Quantity">
+          <input type="text" placeholder="Label (e.g. box, pack)">
+        </div>
+
+        <div class="form-label-row">
+          <label>Supply Date</label>
+          <label>Expiration Date</label>
+        </div>
+        <div class="form-group form-row">
+          <input type="date" placeholder="Supply Date">
+          <input type="date" placeholder="Expiration Date">
+        </div>
+
+        <div class="form-buttons">
+          <button>Submit</button>
+          <button>Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const categoryRadios = document.querySelectorAll('input[name="category"]');
+      const dosageInput = document.getElementById("dosageInput");
+
+      function updateDosageField() {
+        const selectedCategory = document.querySelector('input[name="category"]:checked').value;
+        dosageInput.disabled = selectedCategory !== 'medicine';
+      }
+
+      categoryRadios.forEach(radio => {
+        radio.addEventListener('change', updateDosageField);
+      });
+
+      window.addEventListener("DOMContentLoaded", () => {
+        updateDosageField();
+
+        const datetimeSpan = document.getElementById("datetime");
+        setInterval(() => {
+          const now = new Date();
+          const options = {
+            year: 'numeric', month: 'long', day: 'numeric',
+            hour: '2-digit', minute: '2-digit', second: '2-digit'
+          };
+          datetimeSpan.textContent = now.toLocaleString('en-US', options);
+        }, 1000);
+
+        fetch('nextInvID.php')
+          .then(response => response.json())
+          .then(data => {
+            const idField = document.querySelector('input[placeholder="Inventory ID (View Only)"]');
+            if (data.next_id !== undefined && idField) idField.value = data.next_id;
+          });
+      });
+
+      document.querySelector('.form-buttons button:nth-child(1)').addEventListener('click', () => {
+        const name = document.querySelector('input[placeholder="Item Name"]').value.trim();
+        const description = document.querySelector('textarea').value.trim();
+        const quantity = document.querySelector('input[placeholder="Quantity"]').value.trim();
+        const label = document.querySelector('input[placeholder="Label (e.g. box, pack)"]').value.trim();
+        const supplyDate = document.querySelector('input[placeholder="Supply Date"]').value;
+        const expiryDate = document.querySelector('input[placeholder="Expiration Date"]').value;
+        const category = document.querySelector('input[name="category"]:checked').value;
+        const dosage = dosageInput.value.trim();
+
+        if (name === "") return alert("Item name can't be blank.");
+        if (quantity === "" || label === "") return alert("Input quantity and its label.");
+
+        if (expiryDate) {
+          const today = new Date();
+          const expDate = new Date(expiryDate);
+          today.setHours(0, 0, 0, 0);
+          expDate.setHours(0, 0, 0, 0);
+
+          if (expDate < today) return alert("Item already Expired.");
+        } else if (category === "medicine") {
+          return alert("Medicine requires expiration.");
+        }
+
+        const data = {
+          invName: name,
+          invDescription: description,
+          invCategory: category,
+          invDosage: category === 'medicine' ? dosage : '',
+          itemQuantity: `${quantity} ${label}`,
+          invSupplyDate: supplyDate,
+          invExpiryDate: expiryDate
+        };
+
+        fetch('insertInv.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+          if (result.status === 'success') {
+            alert('Item added successfully!');
+            location.reload();
+          } else {
+            alert('Failed to add item: ' + result.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while adding the item.');
+        });
+      });
+
+      document.querySelector('.form-buttons button:nth-child(2)').addEventListener('click', () => {
+        document.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], textarea').forEach(el => el.value = "");
+        document.querySelector('input[placeholder="Inventory ID (View Only)"]').value = "";
+        document.querySelector('input[name="category"][value="medicine"]').checked = true;
+        updateDosageField();
+
+        fetch('nextInvID.php')
+          .then(response => response.json())
+          .then(data => {
+            const idField = document.querySelector('input[placeholder="Inventory ID (View Only)"]');
+            if (data.next_id !== undefined && idField) idField.value = data.next_id;
+          });
+      });
+
+      document.getElementById("backBtn").addEventListener("click", () => window.location.href = "INVDASH.html");
+      document.getElementById("notif").addEventListener("click", () => window.location.href = "INVNOTIF.html");
+      document.getElementById("addBtn").addEventListener("click", () => window.location.href = "ADDITEM.html");
+      document.getElementById("updBtn").addEventListener("click", () => window.location.href = "UPDATEINV.html");
+      document.getElementById("archBtn").addEventListener("click", () => window.location.href = "ARCHITEM.html");
+    </script>
+</body>
+</html>
