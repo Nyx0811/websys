@@ -5,23 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Inventory</title>
   <link rel="stylesheet" href="../Stylesheet/Inv/Inventory.css" />
-  <script src="https://kit.fontawesome.com/f543d9f8e5.js" crossorigin="anonymous"></script>
-</head>
+  <script src="https://kit.fontawesome.com/f543d9f8e5.js" crossorigin="anonymous"></script> </head>
 <body>
   <div class="sidebar">
-    <div class="icon" id="backBtn" title="Back"><i class="fa-solid fa-arrow-left fa-2x" style="color: #ffffff;"></i></div>
-    <div class="icon" id="addBtn" title="AddItem"><i class="fa-regular fa-square-plus fa-xl" style="color: #ffffff;"></i></div>
-    <div class="icon" id="notifBtn" title="Notifications"><i class="fa-regular fa-bell fa-xl" style="color: #ffffff;"></i></div>
+    <div class="icon" id="backBtn" title="Back">
+        <a href="INVDASH.html" style="color:white; text-decoration:none; display:flex; justify-content:center; align-items:center; width:100%; height:100%;">
+            <i class="fa-solid fa-magnifying-glass fa-2x" style="color: #ffffff;"></i>
+        </a>
+    </div>
+    <div class="icon" id="addBtn" title="AddItem">
+        <a href="ADDITEM.html" style="color:white; text-decoration:none; display:flex; justify-content:center; align-items:center; width:100%; height:100%;">
+            <i class="fa-regular fa-square-plus fa-xl" style="color: #ffffff;"></i>
+        </a>
+    </div>
+    <div class="icon" id="archiveLinkIcon" title="Archive Inventory">
+        <a href="ARCHITEM.html" style="color:white; text-decoration:none; display:flex; justify-content:center; align-items:center; width:100%; height:100%;">
+            <i class="fa-solid fa-archive fa-xl" style="color: #ffffff;"></i>
+        </a>
+    </div>
+    <div class="icon" id="notifBtn" title="Notifications">
+        <a href="INVNOTIF.html" style="color:white; text-decoration:none; display:flex; justify-content:center; align-items:center; width:100%; height:100%;">
+            <i class="fa-regular fa-bell fa-xl" style="color: #ffffff;"></i>
+        </a>
+    </div>
+     <div class="icon" title="Logout" style="margin-top: auto; margin-bottom: 10px;"> <a href="../Login/logout.php" style="color:white; text-decoration:none; display:flex; justify-content:center; align-items:center; width:100%; height:100%;">
+        <i class="fa-solid fa-right-from-bracket fa-2x" style="color: #ffffff;"></i>
+      </a>
+    </div>
   </div>
 
+  <nav>
+    <a href="../Doctor/docDashboard.php">Dashboard</a>
+    <a href="../Doctor/viewAppointments.php">Admission</a>
+    <a href="../Inventory/INVDASH.html" class="active">Inventory</a>
+  </nav>
   <div class="main">
-    <div class="top-bar">
-      <h2>Inventory</h2>
-      <div class="buttons">
-        <button id="archiveBtn" class="archive-btn">Archive Inventory</button>
-      </div>
-    </div>
-
     <div class="subtitle-container">
       <div class="subtitle">
         <h3>View Inventory</h3>
@@ -44,6 +62,7 @@
         <span class="date-time" id="datetime">Loading...</span>
       </div>
     </div>
+    
 
     <table>
       <thead>
@@ -60,8 +79,11 @@
           <th>Actions</th>
         </tr>
       </thead>
-      <tbody id="inventory-table-body"></tbody>
+      <tbody id="inventory-table-body">
+          </tbody>
     </table>
+  </div>
+
   </div>
 
   <div id="editModal" class="modal">
@@ -119,70 +141,58 @@
   </div>
 
   <script>
-    let currentInventoryItems = []; // Stores the active inventory items fetched from server
+    // Your existing JavaScript for INVDASH.html functionality
+    // ... (fetchInventory, renderInventoryTable, openEditModal, etc.) ...
+    let currentInventoryItems = [];
 
-    // Helper function to get today's date in YYYY-MM-DD format
     function getTodayDateString() {
       return new Date().toISOString().split('T')[0];
     }
 
-    // START: Client-side function to attempt archiving expired items
     function autoArchiveExpiredClientSide(items) {
       const today = getTodayDateString();
-      let refreshNeeded = false; // Flag to indicate if the list should be refreshed
+      let refreshNeeded = false;
 
       console.log("Checking for expired items...");
 
       items.forEach(item => {
-        // Check if the item has an expiry date, if it's before today,
-        // and assume it's active (since loadInv.php only fetches active items).
-        // The item.invStatus !== 'archived' check is a good safeguard if data source changes.
         if (item.invExpiryDate && item.invExpiryDate < today) {
           console.log(`Item ID ${item.invID} (${item.invName}) is expired. Archiving item.`);
-          refreshNeeded = true; // An attempt will be made, so plan to refresh
-
-          // Call moveToArchive.php to archive the item
-          // moveToArchive.php expects 'inventory_no' in the request body
-          fetch('moveToArchive.php', {
+          refreshNeeded = true;
+          fetch('moveToArchive.php', { // Assuming moveToArchive.php is in the same directory or correct path
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ inventory_no: item.invID }) // Send invID as inventory_no
+            body: JSON.stringify({ inventory_no: item.invID })
           })
-          .then(response => response.json()) // Assuming moveToArchive.php returns JSON
+          .then(response => response.json())
           .then(data => {
             if (data.status === 'success') {
               console.log(`Client-side: Item ID ${item.invID} successfully archived via auto-check.`);
             } else {
-              // Log warning if server indicates failure (e.g., item already archived, not found, or DB error)
               console.warn(`Client-side: Failed to auto-archive Item ID ${item.invID}. Server message: ${data.message || 'Unknown error'}`);
             }
           })
           .catch(error => {
-            // Log network or other errors during the fetch operation
             console.error(`Client-side: Error auto-archiving Item ID ${item.invID}:`, error);
           });
         }
       });
 
-      // If any archive attempts were made, refresh the inventory list after a short delay
-      // This ensures the UI reflects the changes (i.e., expired items are removed from active view)
       if (refreshNeeded) {
         console.log("Client-side: Auto-archive attempts made. Refreshing inventory list in 2 seconds.");
         setTimeout(() => {
-          applyFilters(); // Use existing applyFilters function to refresh with current filter state
-        }, 2000); // 2-second delay to allow fetch requests to potentially complete
+          applyFilters();
+        }, 2000);
       }
     }
-    // END: Client-side function to attempt archiving expired items
 
-    // Function to fetch active inventory from the server
     function fetchInventory(category = '', searchTerm = '', campus = '') {
       const params = new URLSearchParams();
       if (category) params.append('category', category);
       if (searchTerm) params.append('search', searchTerm);
       if (campus) params.append('campus', campus);
 
-      fetch(`loadInv.php?${params.toString()}`)
+      fetch(`loadInv.php?${params.toString()}`) // Assuming loadInv.php is in the same directory or correct path
         .then(res => {
             if (!res.ok) {
                 throw new Error(`HTTP error! status: ${res.status}`);
@@ -196,14 +206,12 @@
             currentInventoryItems = [];
             return;
           }
-          currentInventoryItems = data; // Store the fetched active items
+          currentInventoryItems = data;
           renderInventoryTable(data);
-          
-          // START: Call the client-side auto-archive function after rendering
+
           if (currentInventoryItems.length > 0) {
-            autoArchiveExpiredClientSide(currentInventoryItems); 
+            autoArchiveExpiredClientSide(currentInventoryItems);
           }
-          // END: Call the client-side auto-archive function
         })
         .catch(err => {
           console.error('Fetch Inventory Error:', err);
@@ -211,7 +219,6 @@
         });
     }
 
-    // Function to render the inventory table (no changes here, uses existing structure)
     function renderInventoryTable(items) {
       const tbody = document.getElementById('inventory-table-body');
       tbody.innerHTML = '';
@@ -233,7 +240,7 @@
         row.insertCell().textContent = item.itemQuantity || 'N/A';
         row.insertCell().textContent = item.invSupplyDate || 'N/A';
         row.insertCell().textContent = item.invExpiryDate || 'N/A';
-        row.insertCell().textContent = item.invCampus || 'N/A';
+        row.insertCell().textContent = item.invCampus || 'N/A'; // Assumes invCampus is the campus name
 
         const actionsCell = row.insertCell();
         actionsCell.style.textAlign = 'center';
@@ -244,17 +251,16 @@
         editBtn.onclick = () => openEditModal(item.invID);
         actionsCell.appendChild(editBtn);
 
-        const archiveBtn = document.createElement('button'); // This is the manual archive button
-        archiveBtn.textContent = 'Archive';
-        archiveBtn.className = 'action-btn archive-btn-table';
-        archiveBtn.onclick = () => archiveItem(item.invID, item.invName); // Calls your existing manual archive function
-        actionsCell.appendChild(archiveBtn);
+        const archiveBtnTable = document.createElement('button'); // Changed variable name for clarity
+        archiveBtnTable.textContent = 'Archive';
+        archiveBtnTable.className = 'action-btn archive-btn-table'; // Uses specific class for table archive button
+        archiveBtnTable.onclick = () => archiveItem(item.invID, item.invName);
+        actionsCell.appendChild(archiveBtnTable);
       });
     }
 
-    // Function to open the edit modal (no changes here, uses existing structure)
     function openEditModal(invID) {
-      const item = currentInventoryItems.find(i => String(i.invID) === String(invID)); 
+      const item = currentInventoryItems.find(i => String(i.invID) === String(invID));
       if (!item) {
         alert("Item not found for ID: " + invID);
         return;
@@ -263,23 +269,23 @@
       document.getElementById('edit-inv-id').value = item.invID;
       document.getElementById('edit-inv-name').value = item.invName || '';
       document.getElementById('edit-inv-description').value = item.invDescription || '';
-      document.getElementById('edit-inv-dosage').value = item.invDosage || ''; 
+      document.getElementById('edit-inv-dosage').value = item.invDosage || '';
       document.getElementById('edit-inv-quantity').value = item.itemQuantity || '';
-      document.getElementById('edit-campus').value = item.invCampus || '';
+      document.getElementById('edit-campus').value = item.campusID || ''; // Use campusID for the value
       document.getElementById('edit-supply-date').value = item.invSupplyDate || '';
       document.getElementById('edit-expiry-date').value = item.invExpiryDate || '';
       document.getElementById('edit-supply-date').max = getTodayDateString();
+
       const itemCategoryLower = item.invCategory ? item.invCategory.toLowerCase() : null;
       document.querySelectorAll('input[name="edit-category"]').forEach(r => {
         const radioValueLower = r.value.toLowerCase().replace(/s$/, '');
         const dbCategoryNormalized = itemCategoryLower ? itemCategoryLower.replace(/s$/, '') : null;
         r.checked = (radioValueLower === dbCategoryNormalized);
       });
-      handleEditDosageField(); 
+      handleEditDosageField();
       document.getElementById('editModal').style.display = 'block';
     }
 
-    // Function to handle dosage field in modal (no changes here)
     function handleEditDosageField() {
       const selectedRadio = document.querySelector('input[name="edit-category"]:checked');
       const dosageInput = document.getElementById('edit-inv-dosage');
@@ -299,7 +305,6 @@
       radio.addEventListener('change', handleEditDosageField);
     });
 
-    // Function to close modal (no changes here)
     function closeModal() {
       document.getElementById('editModal').style.display = 'none';
     }
@@ -308,7 +313,6 @@
       if (e.target == document.getElementById('editModal')) closeModal();
     };
 
-    // Edit form submission (no changes to core logic here)
     document.getElementById('edit-form').addEventListener('submit', function(e) {
       e.preventDefault();
       const invID = document.getElementById('edit-inv-id').value;
@@ -318,7 +322,7 @@
       const invCategory = invCategoryRadio ? invCategoryRadio.value : '';
       const invDosage = document.getElementById('edit-inv-dosage').value.trim();
       const itemQuantity = document.getElementById('edit-inv-quantity').value;
-      const invCampus = document.getElementById('edit-campus').value;
+      const campusValueFromForm = document.getElementById('edit-campus').value;
       const supplyDate = document.getElementById('edit-supply-date').value;
       const expiryDate = document.getElementById('edit-expiry-date').value;
       const today = getTodayDateString();
@@ -326,9 +330,9 @@
       if (!invName) return alert("Name is required.");
       if (!invCategoryRadio) return alert("Category is required.");
       if (supplyDate > today) return alert("Supply date cannot be in the future.");
-      const campusNum = parseInt(invCampus, 10);
-      if (invCampus && (isNaN(campusNum) || campusNum < 1 || campusNum > 2)) {
-          alert("Campus must be either 1 or 2.");
+      const campusNum = parseInt(campusValueFromForm, 10);
+      if (campusValueFromForm && (isNaN(campusNum) || campusNum < 1 || campusNum > 2)) {
+          alert("Campus must be either 1 (Elida) or 2 (Marciano)."); // Updated alert
           document.getElementById('edit-campus').focus();
           return;
       }
@@ -347,12 +351,19 @@
       }
       if (!confirm("Are you sure you want to update this item?")) return;
 
-      fetch('UpdItem.php', {
+      fetch('UpdItem.php', { // Assuming UpdItem.php is in the same directory or correct path
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          invID, invName, invDescription, invCategory, invDosage,
-          itemQuantity, invCampus, invSupplyDate: supplyDate, invExpiryDate: expiryDate
+          invID: invID,
+          invName: invName,
+          invDescription: invDescription,
+          invCategory: invCategory,
+          invDosage: invDosage,
+          itemQuantity: itemQuantity,
+          campusID: campusValueFromForm, // Send as 'campusID'
+          invSupplyDate: supplyDate,
+          invExpiryDate: expiryDate
         })
       })
       .then(res => {
@@ -363,21 +374,20 @@
         if (data.status === 'success') {
           alert("Item updated successfully!");
           closeModal();
-          applyFilters(); // Use applyFilters to refresh
+          applyFilters();
         } else {
           alert("Update failed: " + (data.message || "Unknown error"));
         }
       })
       .catch(err => {
         console.error('Update Item Error:', err);
-        alert("Error during update: " + err.message);
+        alert("Error during update: " . err.message);
       });
     });
 
-    // Your existing manual archiveItem function (no changes here)
     function archiveItem(invID, invName) {
       if (!confirm(`Are you sure you want to archive "${invName}" (ID: ${invID})?`)) return;
-      fetch('moveToArchive.php', {
+      fetch('moveToArchive.php', { // Assuming moveToArchive.php is in the same directory or correct path
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ inventory_no: invID })
@@ -389,18 +399,17 @@
       .then(data => {
         if (data.status === 'success') {
           alert("Item archived successfully.");
-          applyFilters(); // Use applyFilters to refresh
+          applyFilters();
         } else {
           alert("Failed to archive: " + (data.message || "Unknown error"));
         }
       })
       .catch(err => {
         console.error('Archive Item Error:', err);
-        alert("Error during archiving: " + err.message);
+        alert("Error during archiving: " . err.message);
       });
     }
 
-    // Event listeners for filters and applyFilters function (no changes here)
     document.getElementById('categoryCmb').onchange = () => applyFilters();
     document.getElementById('campusCmb').onchange = () => applyFilters();
     document.getElementById('search-input').oninput = () => applyFilters();
@@ -413,7 +422,6 @@
       );
     }
 
-    // Date and time update function (no changes here)
     function updateDateTime() {
       document.getElementById('datetime').textContent =
         new Date().toLocaleString('en-US', {
@@ -423,23 +431,27 @@
     }
     setInterval(updateDateTime, 1000);
     updateDateTime();
-    
-    // Initial fetch of inventory
-    fetchInventory(); 
 
-    // Navigation button event listeners (no changes to wording or redirections)
-    document.getElementById("backBtn").addEventListener("click", () => {
-      window.location.href =  "../Doctor/docDashboard.php";
-    });
-    document.getElementById("notifBtn").addEventListener("click", () => {
-      window.location.href = "INVNOTIF.html"; 
-    });
-    document.getElementById("addBtn").addEventListener("click", () => { // This is the icon button in sidebar
-      window.location.href = "ADDITEM.html";
-    });
-    document.getElementById("archiveBtn").addEventListener("click", () => { // This is the button in top-bar
-      window.location.href = "ARCHITEM.html"; 
-    });
+    fetchInventory();
+
+    // Event listeners for NEW sidebar icons (if their IDs change, update here)
+    // document.getElementById("backBtn").addEventListener("click", () => {
+    //   window.location.href =  "../Doctor/docDashboard.php"; // Example path
+    // });
+    // document.getElementById("addBtn").addEventListener("click", () => {
+    //   window.location.href = "ADDITEM.html"; // Ensure this page exists and path is correct
+    // });
+    // Link for the new archive icon can be added here if it's not just a link in HTML
+    // document.getElementById("archiveLinkIcon").addEventListener("click", () => { // Assuming new ID for archive icon
+    //   window.location.href = "ARCHITEM.html"; // Ensure this page exists and path is correct
+    // });
+    // document.getElementById("notifBtn").addEventListener("click", () => {
+    //   window.location.href = "INVNOTIF.html"; // Ensure this page exists and path is correct
+    // });
+
+    // The JavaScript for the original top-bar archive button (id="archiveBtn") is removed as the button is moved.
+    // The new icon in the sidebar for "Archive Inventory" is now an <a> tag directly linking to ARCHITEM.html.
+    // Similarly for AddItem, Notifications, and Back. If they need JS-driven actions, those would be separate.
   </script>
 </body>
 </html>

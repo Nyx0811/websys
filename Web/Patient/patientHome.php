@@ -9,6 +9,7 @@
       <title>Clinick</title>
       <link rel="stylesheet" href="../Stylesheet/style.css">
       <script src="https://kit.fontawesome.com/503ea13a85.js" crossorigin="anonymous"></script>
+      <a href="../Login/logout.php">Logout</a>
   </head>
   <body>
       <div class="container">

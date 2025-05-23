@@ -76,15 +76,12 @@ body {
   
   h1 {
     position:relative;
+    font-family: Arial, sans-serif;    
     margin-top: 10px;
     left: 58px; /* leave space for sidebar */
     right: 0;
     display: block;
   }
-
-    h1 strong{
-      font-family: Helvetica, Arial, sans-serif;
-    }
   
   table {
     width: 100%;
@@ -148,3 +145,10 @@ body {
     font-size: 28px;
     cursor: pointer;
   }
+
+  .modal-content h2 {
+    margin-left: 0;
+  }
+.status.pending { color: orange; font-weight: bold; }
+.status.approved { color: green; font-weight: bold; }
+.status.declined { color: red; font-weight: bold; }

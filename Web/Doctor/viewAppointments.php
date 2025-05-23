@@ -13,8 +13,8 @@ require '../Config/database.php';
 <body>
   <div class="sidebar">
     <a href="#"><i class="fa-solid fa-house fa-3x"></i></a>
-    <a href="#"><i class="fa-solid fa-stethoscope fa-3x"></i></a>
-    <a href="#"><i class="fa-solid fa-box fa-3x"></i></a>
+    <a href="consultGrant.php"><i class="fa-solid fa-clipboard fa-3x"></i></a>
+    <a href="doneAppoint.php"><i class="fa-solid fa-book-medical fa-3x"></i></a>
   </div>
 
   <div class="main">
@@ -26,17 +26,15 @@ require '../Config/database.php';
     <br>
     <div class="appointments-container">
       <h2>My Patients | <?php echo date('F d, Y'); ?></h2>
+    </div>
       <table class="appointments-table">
         <thead>
           <tr>
             <th>School No.</th>
             <th>Name</th>
-            <th>Position</th>
             <th>Department</th>
-            <th>Date of Appointment</th>
-            <th>Visit Status</th>
+            <th>Date</th>
             <th>Type of Visit</th>
-            <th>Doctor</th>
             <th>Status</th>
             <th>Link</th>
             <th>Actions</th>
@@ -46,47 +44,63 @@ require '../Config/database.php';
           <?php
           try {
             $query = "SELECT 
-                        a.id,
-                        p.campusID as school_no,
-                        CONCAT(p.firstName, ' ', COALESCE(p.lastName, '')) as patient_name,
-                        pos.position_name,
-                        dept.name as department,
-                        DATE_FORMAT(a.appointment_date, '%Y-%m-%d %H:%i:%s') as appointment_date,
-                        CASE 
-                          WHEN a.status = 'Scheduled' THEN 'Follow-Up'
-                          WHEN a.status = 'Completed' THEN 'New Patient'
-                        END as visit_status,
-                        a.type_of_admission,
-                        CONCAT(d.first_name, ' ', d.last_name) as doctor_name,
-                        a.status,
-                        a.link
+                      a.appID AS appID,
+                      u.schoolID AS school_no,
+                      CONCAT(u.fname, ' ', u.lname) AS patient_name,
+                      d.deptName AS department,
+                      a.consultDate AS consultationDate,
+                      a.mode AS type_of_visit,
+                      a.link,
+                      a.status
                       FROM appointments a
-                      JOIN patientsInfo p ON a.patient_id = p.patientID
-                      JOIN patient_departments dept ON a.dept_id = dept.id
-                      JOIN doctors d ON a.doctor_id = d.id
-                      JOIN patient_positions pos ON dept.position_id = pos.id
-                      ORDER BY a.appointment_date DESC";
+                      JOIN userInfo u    ON a.UID    = u.UID
+                      JOIN departments d ON u.deptID = d.deptID
+                      WHERE a.status = 'Approved'
+                      AND DATE(a.consultDate) >= CURDATE()
+                      ORDER BY a.consultDate ASC";
+
 
             $stmt = $conn->prepare($query);
             $stmt->execute();
 
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-              echo "<tr>
-                      <td>" . htmlspecialchars($row['school_no']) . "</td>
-                      <td>" . htmlspecialchars($row['patient_name']) . "</td>
-                      <td>" . htmlspecialchars($row['position_name']) . "</td>
-                      <td>" . htmlspecialchars($row['department']) . "</td>
-                      <td>" . htmlspecialchars($row['appointment_date']) . "</td>
-                      <td>" . htmlspecialchars($row['visit_status']) . "</td>
-                      <td>" . htmlspecialchars($row['type_of_admission']) . "</td>
-                      <td>Doc. " . htmlspecialchars($row['doctor_name']) . "</td>
-                      <td>" . htmlspecialchars($row['status']) . "</td>
-                      <td>" . (!empty($row['link']) ? "<a href='{$row['link']}' target='_blank'>Join</a>" : "") . "</td>
-                      <td><button class='prescribe-btn' data-patient-name='" . htmlspecialchars($row['patient_name']) . "' data-appointment-id='" . $row['id'] . "'>Prescribe</button></td>
-                    </tr>";
+            if ($stmt->rowCount() > 0) {
+              while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                echo "<tr>";
+                echo "<td>" . htmlspecialchars($row['school_no']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['patient_name']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['department']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['consultationDate']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['type_of_visit']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['status']) . "</td>";
+                echo "<td>";
+                if ($row['type_of_visit'] === 'Online') {
+                  if (!empty($row['link'])) {
+                    echo "<a href='" . htmlspecialchars($row['link']) . "' target='_blank' class='meeting-link'>";
+                    echo "<i class='fa-solid fa-video'></i> Join";
+                    echo "</a>";
+                  } else {
+                    echo "<input type='text' placeholder='Enter link' class='link-input' data-app-id='" . htmlspecialchars($row['appID']) . "' />";
+                    echo "<button class='save-link-btn' data-app-id='" . htmlspecialchars($row['appID']) . "'>Save</button>";
+                  }
+                } else {
+                  echo "—";
+                }
+                echo "</td>";
+
+                echo "<td>";
+                echo "<button class='prescribe-btn' 
+                        data-patient-name='" . htmlspecialchars($row['patient_name']) . "' 
+                        data-app-id='" . htmlspecialchars($row['appID']) . "'>
+                        Prescribe</button>";
+                echo " <button class='remove-btn' title='Remove Patient'>&#10060;</button>";
+                echo "</td>";
+                echo "</tr>";
+              }
+            } else {
+              echo "<tr><td colspan='7' style='text-align: center;'>No approved consultations found</td></tr>";
             }
           } catch (PDOException $e) {
-            echo "<tr><td colspan='11'>Error: " . $e->getMessage() . "</td></tr>";
+            echo "<tr><td colspan='7' style='text-align: center; color: red;'>Error: " . $e->getMessage() . "</td></tr>";
           }
           ?>
         </tbody>
@@ -102,6 +116,8 @@ require '../Config/database.php';
     </div>
   </div>
 
-  <script src="../JScripts/modalLoader.js"></script>
+  <i class="fa-regular fa-user" id="profile"></i>
+  <script src="../JScripts/index.js"></script>
 </body>
 </html>
+<?php $conn = null; ?>

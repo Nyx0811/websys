@@ -9,34 +9,52 @@
 </head>
 <body>
   <div class="sidebar">
-    <div class="icon" id="backBtn"><i class="fa-solid fa-arrow-left fa-2x" style="color: #ffffff;"></i></div>
-    <div class="icon"><i class="fa-solid fa-clock-rotate-left fa-xl" style="color: #ffffff;"></i></div>
-    <div class="icon" id="notif"><i class="fa-regular fa-bell fa-xl" style="color: #ffffff;"></i></div>
-    <div class="icon"><i class="fa-solid fa-user fa-xl" style="color: #ffffff;"></i></div>
-  </div>
-  <div class="main">
-    <div class="top-bar">
-      <h2>Inventory</h2>
-      <div class="buttons">
-        <button id="addBtn">Add Item</button>
-        <button id="updBtn">Update Inventory</button>
-        <button id="archBtn">Archive Inventory</button>
-      </div>
+    <div class="icon" id="backBtn" title="Back">
+        <a href="INVDASH.html" style="color:white; text-decoration:none; display:flex; justify-content:center; align-items:center; width:100%; height:100%;">
+            <i class="fa-solid fa-magnifying-glass fa-xl" style="color: #ffffff;"></i>
+        </a>
     </div>
+    <div class="icon" id="addBtn" title="AddItem">
+        <a href="ADDITEM.html" style="color:white; text-decoration:none; display:flex; justify-content:center; align-items:center; width:100%; height:100%;">
+            <i class="fa-regular fa-square-plus fa-xl" style="color: #ffffff;"></i>
+        </a>
+    </div>
+    <div class="icon" id="archiveLinkIcon" title="Archive Inventory">
+        <a href="ARCHITEM.html" style="color:white; text-decoration:none; display:flex; justify-content:center; align-items:center; width:100%; height:100%;">
+            <i class="fa-solid fa-archive fa-xl" style="color: #ffffff;"></i>
+        </a>
+    </div>
+    <div class="icon" id="notifLink" title="Notifications"> <a href="INVNOTIF.html" style="color:white; text-decoration:none; display:flex; justify-content:center; align-items:center; width:100%; height:100%;">
+            <i class="fa-regular fa-bell fa-xl" style="color: #ffffff;"></i>
+        </a>
+    </div>
+    <div class="icon" title="History"> <i class="fa-solid fa-clock-rotate-left fa-xl" style="color: #ffffff;"></i>
+        </div>
+    <div class="icon" title="User Profile"> <i class="fa-solid fa-user fa-xl" style="color: #ffffff;"></i>
+        </div>
+    <div class="icon" title="Logout" style="margin-top: auto; margin-bottom: 10px;">
+      <a href="../Login/logout.php" style="color:white; text-decoration:none; display:flex; justify-content:center; align-items:center; width:100%; height:100%;">
+        <i class="fa-solid fa-right-from-bracket fa-2x" style="color: #ffffff;"></i>
+      </a>
+    </div>
+  </div>
 
+  <nav>
+    <a href="../Doctor/docDashboard.php">Dashboard</a>
+    <a href="../Doctor/viewAppointments.php">Admission</a>
+    <a href="INVDASH.html" class="active">Inventory</a>
+  </nav>
+  <div class="main">
     <div class="datetime" id="datetime">Loading date and time..</div>
 
     <div class="form-container">
       <div class="form-box">
-        <h3>Add Items</h3>
-        <div class="form-group form-row">
-          <input type="text" placeholder="Item Name">
-          <input type="text" placeholder="Inventory ID (View Only)" disabled>
-        </div>
+        <h3>Add Items</h3> <div class="form-group form-row">
+          <input type="text" id="itemName" placeholder="Item Name">
+          <input type="text" id="inventoryIDView" placeholder="Inventory ID (View Only)" readonly> </div>
 
         <div class="form-group">
-          <label>Category:</label>
-          <div class="category-options">
+          <label>Category:</label> <div class="category-options">
             <label><input type="radio" name="category" value="medicine" checked> Medicine</label>
             <label><input type="radio" name="category" value="medical supplies"> Medical Supplies</label>
             <label><input type="radio" name="category" value="medical equipments"> Medical Equipments</label>
@@ -44,21 +62,20 @@
         </div>
 
         <div class="form-group">
-          <textarea placeholder="Description" rows="4"></textarea>
+          <textarea id="itemDescription" placeholder="Description" rows="4"></textarea>
         </div>
 
         <div class="form-group">
           <label>Dosage:</label>
           <input type="text" placeholder="Enter Dosage: (e.g. 500mg capsule or 5ml syrup)" id="dosageInput">
         </div>
-
+        
         <div class="form-label-row">
           <label>Quantity</label>
           <label>Label</label>
         </div>
         <div class="form-group form-row">
-          <input type="number" placeholder="Quantity">
-          <input type="text" placeholder="Label (e.g. box, pack)">
+          <input type="number" id="itemQuantity" placeholder="Quantity" min="0"> <input type="text" id="itemLabel" placeholder="Label (e.g. box, pack)">
         </div>
 
         <div class="form-label-row">
@@ -66,73 +83,128 @@
           <label>Expiration Date</label>
         </div>
         <div class="form-group form-row">
-          <input type="date" placeholder="Supply Date">
-          <input type="date" placeholder="Expiration Date">
+          <input type="date" id="supplyDate">
+          <input type="date" id="expiryDate">
         </div>
 
         <div class="form-buttons">
-          <button>Submit</button>
-          <button>Clear</button>
-        </div>
+          <button id="submitBtn" type="button">Submit</button> <button id="clearBtn" type="button">Clear</button>   </div>
       </div>
     </div>
+  </div> <script>
+      // Your existing JavaScript from ADDITEM.html
+      // The event listeners for #backBtn, #addBtn, #updBtn, #archBtn will no longer find those elements
+      // as #backBtn is removed and the others were part of the old top-bar.
+      // The listener for #notif still exists if you keep id="notif" on the icon's div or link.
+      // I changed id="notif" to id="notifLink" for the <a> tag for clarity.
+      // If you want to keep the JS listener for notif, ensure its ID matches.
+      // For now, the <a> tag for notifications will handle navigation directly.
 
-    <script>
       const categoryRadios = document.querySelectorAll('input[name="category"]');
       const dosageInput = document.getElementById("dosageInput");
+      const itemNameInput = document.getElementById("itemName");
+      const inventoryIDViewInput = document.getElementById("inventoryIDView");
+      const itemDescriptionInput = document.getElementById("itemDescription");
+      const itemQuantityInput = document.getElementById("itemQuantity");
+      const itemLabelInput = document.getElementById("itemLabel");
+      const supplyDateInput = document.getElementById("supplyDate");
+      const expiryDateInput = document.getElementById("expiryDate");
+
+      function getTodayDateString() {
+        return new Date().toISOString().split('T')[0];
+      }
 
       function updateDosageField() {
-        const selectedCategory = document.querySelector('input[name="category"]:checked').value;
-        dosageInput.disabled = selectedCategory !== 'medicine';
+        const selectedCategoryRadio = document.querySelector('input[name="category"]:checked');
+        if (selectedCategoryRadio) {
+            const selectedCategory = selectedCategoryRadio.value;
+            dosageInput.disabled = selectedCategory !== 'medicine';
+            if (selectedCategory !== 'medicine') {
+                dosageInput.value = '';
+            }
+            expiryDateInput.required = (selectedCategory === 'medicine');
+        } else {
+            dosageInput.disabled = true;
+            expiryDateInput.required = false;
+        }
       }
 
       categoryRadios.forEach(radio => {
         radio.addEventListener('change', updateDosageField);
       });
 
+      function fetchNextInvID() {
+        fetch('nextInvID.php') // Ensure path is correct
+          .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok: ' + response.statusText);
+            return response.json();
+           })
+          .then(data => {
+            if (data.next_id !== undefined && inventoryIDViewInput) {
+                 inventoryIDViewInput.value = data.next_id;
+            } else if (data.error) {
+                console.error('Error from nextInvID.php:', data.error);
+                if(inventoryIDViewInput) inventoryIDViewInput.value = "Error";
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching next Inv ID:', error);
+            if(inventoryIDViewInput) inventoryIDViewInput.value = "N/A";
+          });
+      }
+      
+      function updateDateTime(){
+          const datetimeSpan = document.getElementById("datetime");
+          if (datetimeSpan) {
+             const now = new Date();
+             const options = {
+                 year: 'numeric', month: 'long', day: 'numeric',
+                 hour: '2-digit', minute: '2-digit', second: '2-digit'
+             };
+             datetimeSpan.textContent = now.toLocaleString('en-US', options);
+          }
+      }
+
       window.addEventListener("DOMContentLoaded", () => {
         updateDosageField();
-
-        const datetimeSpan = document.getElementById("datetime");
-        setInterval(() => {
-          const now = new Date();
-          const options = {
-            year: 'numeric', month: 'long', day: 'numeric',
-            hour: '2-digit', minute: '2-digit', second: '2-digit'
-          };
-          datetimeSpan.textContent = now.toLocaleString('en-US', options);
-        }, 1000);
-
-        fetch('nextInvID.php')
-          .then(response => response.json())
-          .then(data => {
-            const idField = document.querySelector('input[placeholder="Inventory ID (View Only)"]');
-            if (data.next_id !== undefined && idField) idField.value = data.next_id;
-          });
+        if(supplyDateInput) supplyDateInput.max = getTodayDateString();
+        
+        updateDateTime(); // Call once immediately
+        setInterval(updateDateTime, 1000);
+        fetchNextInvID();
       });
 
-      document.querySelector('.form-buttons button:nth-child(1)').addEventListener('click', () => {
-        const name = document.querySelector('input[placeholder="Item Name"]').value.trim();
-        const description = document.querySelector('textarea').value.trim();
-        const quantity = document.querySelector('input[placeholder="Quantity"]').value.trim();
-        const label = document.querySelector('input[placeholder="Label (e.g. box, pack)"]').value.trim();
-        const supplyDate = document.querySelector('input[placeholder="Supply Date"]').value;
-        const expiryDate = document.querySelector('input[placeholder="Expiration Date"]').value;
-        const category = document.querySelector('input[name="category"]:checked').value;
+
+      document.getElementById('submitBtn').addEventListener('click', () => {
+        const name = itemNameInput.value.trim();
+        const description = itemDescriptionInput.value.trim();
+        const quantity = itemQuantityInput.value.trim();
+        const label = itemLabelInput.value.trim();
+        const supplyDate = supplyDateInput.value;
+        const expiryDate = expiryDateInput.value;
+        const categoryChecked = document.querySelector('input[name="category"]:checked');
+        const category = categoryChecked ? categoryChecked.value : null;
         const dosage = dosageInput.value.trim();
 
+        const todayString = getTodayDateString();
+
         if (name === "") return alert("Item name can't be blank.");
-        if (quantity === "" || label === "") return alert("Input quantity and its label.");
+        if (!category) return alert("Please select a category.");
+        if (quantity === "") return alert("Please enter quantity.");
+        if (isNaN(parseFloat(quantity)) || parseFloat(quantity) < 0) return alert("Quantity must be a valid non-negative number.");
+        if (label === "") return alert("Please enter the unit/label for the quantity (e.g., box, pcs).");
+        if (!supplyDate) return alert("Supply date is required.");
+        if (supplyDate > todayString) return alert("Supply date cannot be in the future.");
 
-        if (expiryDate) {
-          const today = new Date();
-          const expDate = new Date(expiryDate);
-          today.setHours(0, 0, 0, 0);
-          expDate.setHours(0, 0, 0, 0);
-
-          if (expDate < today) return alert("Item already Expired.");
-        } else if (category === "medicine") {
-          return alert("Medicine requires expiration.");
+        if (category === "medicine") {
+            if (!expiryDate) return alert("Medicine category requires an expiration date.");
+            if (new Date(expiryDate) < new Date(todayString)) {
+                 return alert("Expiration date cannot be in the past or today for new medicine entries.");
+            }
+        } else {
+             if (expiryDate && new Date(expiryDate) < new Date(todayString)) {
+                 return alert("Expiration date, if provided, cannot be in the past or today.");
+             }
         }
 
         const data = {
@@ -142,48 +214,63 @@
           invDosage: category === 'medicine' ? dosage : '',
           itemQuantity: `${quantity} ${label}`,
           invSupplyDate: supplyDate,
-          invExpiryDate: expiryDate
+          invExpiryDate: expiryDate || null
+          // campusID is assumed to be handled by insertInv.php via $_SESSION['activeCampusID']
         };
 
-        fetch('insertInv.php', {
+        fetch('insertInv.php', { // Ensure path is correct
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error('Server responded with ' + response.status + ': ' + text) });
+            }
+            return response.json();
+        })
         .then(result => {
           if (result.status === 'success') {
-            alert('Item added successfully!');
-            location.reload();
+            alert('Item added successfully! Inventory ID: ' + (result.insertedID || inventoryIDViewInput.value));
+            itemNameInput.value = "";
+            itemDescriptionInput.value = "";
+            itemQuantityInput.value = "";
+            itemLabelInput.value = "";
+            supplyDateInput.value = "";
+            expiryDateInput.value = "";
+            dosageInput.value = "";
+            document.querySelector('input[name="category"][value="medicine"]').checked = true;
+            updateDosageField();
+            fetchNextInvID(); 
           } else {
-            alert('Failed to add item: ' + result.message);
+            alert('Failed to add item: ' + (result.message || 'Unknown error'));
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          alert('An error occurred while adding the item.');
+          alert('An error occurred while adding the item. Check console for details.');
         });
       });
 
-      document.querySelector('.form-buttons button:nth-child(2)').addEventListener('click', () => {
-        document.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], textarea').forEach(el => el.value = "");
-        document.querySelector('input[placeholder="Inventory ID (View Only)"]').value = "";
+      document.getElementById('clearBtn').addEventListener('click', () => {
+        if (!confirm("Are you sure you want to clear all fields?")) return;
+        itemNameInput.value = "";
+        itemDescriptionInput.value = "";
+        itemQuantityInput.value = "";
+        itemLabelInput.value = "";
+        supplyDateInput.value = "";
+        expiryDateInput.value = "";
+        dosageInput.value = "";
         document.querySelector('input[name="category"][value="medicine"]').checked = true;
         updateDosageField();
-
-        fetch('nextInvID.php')
-          .then(response => response.json())
-          .then(data => {
-            const idField = document.querySelector('input[placeholder="Inventory ID (View Only)"]');
-            if (data.next_id !== undefined && idField) idField.value = data.next_id;
-          });
       });
 
-      document.getElementById("backBtn").addEventListener("click", () => window.location.href = "INVDASH.html");
-      document.getElementById("notif").addEventListener("click", () => window.location.href = "INVNOTIF.html");
-      document.getElementById("addBtn").addEventListener("click", () => window.location.href = "ADDITEM.html");
-      document.getElementById("updBtn").addEventListener("click", () => window.location.href = "UPDATEINV.html");
-      document.getElementById("archBtn").addEventListener("click", () => window.location.href = "ARCHITEM.html");
+      // Original JS for old sidebar/top-bar buttons - these elements no longer exist or are now links
+      // document.getElementById("backBtn").addEventListener("click", () => window.location.href = "INVDASH.html"); // Element removed
+      // document.getElementById("notif").addEventListener("click", () => window.location.href = "INVNOTIF.html"); // Element now id="notifLink" and an <a> tag
+      // document.getElementById("addBtn").addEventListener("click", () => window.location.href = "ADDITEM.html"); // Element removed
+      // document.getElementById("updBtn").addEventListener("click", () => window.location.href = "INVDASH.html"); // Element removed
+      // document.getElementById("archBtn").addEventListener("click", () => window.location.href = "ARCHITEM.html"); // Element removed
     </script>
 </body>
 </html>

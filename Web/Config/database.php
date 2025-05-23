@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$dbname = 'websys';
+$dbname = 'clinick';
 $username = 'root';
 $password = 'Nyxzel09';
 try {

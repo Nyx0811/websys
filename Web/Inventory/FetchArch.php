@@ -1,42 +1,47 @@
 <?php
-include '../config/database.php'; // Ensure this path is correct
+
+include '../config/database.php'; // Your DB connection
 
 header('Content-Type: application/json');
 
-$search = $_GET['search'] ?? '';
+// Get filter values from the URL
 $category = $_GET['category'] ?? '';
+$search = $_GET['search'] ?? '';
+$campus = $_GET['campus'] ?? ''; // This is the campus ID
 
-// Start SQL query, always filtering for archived items
-$sql = "SELECT invID, invName, invDescription, invCategory, invDosage, itemQuantity, invSupplyDate, invExpiryDate, invCampus, archivedTimestamp 
-        FROM inventory 
-        WHERE invStatus = 'archived'"; // <-- CHANGED THIS CONDITION
+// SQL to get archived inventory items and their campus names
+$sql = "SELECT i.*, c.campusName AS invCampus 
+        FROM inventory i 
+        JOIN campus c ON i.campusID = c.campusID 
+        WHERE i.invStatus = 'archived'"; // Only archived items
 
 $params = [];
 
 if (!empty($category)) {
-    $sql .= " AND invCategory = :category";
+    $sql .= " AND i.invCategory = :category";
     $params[':category'] = $category;
 }
 
 if (!empty($search)) {
-    // Search by ID or Name
-    $sql .= " AND (invID LIKE :search_id OR invName LIKE :search_name)";
-    $params[':search_id'] = $search;
-    $params[':search_name'] = "%$search%";
+    $sql .= " AND (i.invID LIKE :search OR i.invName LIKE :search)";
+    $params[':search'] = "%" . $search . "%";
 }
 
-// Optionally, order by when they were archived
-$sql .= " ORDER BY archivedTimestamp DESC";
+if (!empty($campus)) {
+    $sql .= " AND i.campusID = :campus"; // Filter by inventory.campusID
+    $params[':campus'] = $campus;
+}
+
+$sql .= " ORDER BY i.archivedTimestamp DESC"; // Show recently archived first
 
 try {
     $stmt = $conn->prepare($sql);
     $stmt->execute($params);
-    $archivedItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+    $archivedItems = $stmt->fetchAll(PDO::FETCH_ASSOC); // Changed variable name for clarity
     echo json_encode($archivedItems);
 
 } catch (PDOException $e) {
-    error_log("Fetch Archived Error (FetchArch.php): " . $e->getMessage());
-    echo json_encode(['error' => 'Database error while fetching archived items.', 'details' => $e->getMessage()]);
+    error_log("Error in FetchArch.php: " . $e->getMessage());
+    echo json_encode(["error" => "Could not fetch archived inventory.", "details" => $e->getMessage()]);
 }
 ?>

@@ -1,15 +1,20 @@
 <?php
 require '../Config/database.php';  
 //$patientID = $_SESSION['patientID'];
-$patientID = 1;
-$query = "SELECT cr.consultationDate AS dateTime, cr.consultationType, cr.campus, cs.consultID 
-          FROM consultReq cr
-          JOIN consultationSummary cs ON cr.consultID = cs.consultID
-          WHERE cr.patientID = :patientID
-          ORDER BY cr.consultationDate DESC";
+$patientID = 3;
+
+$query = "SELECT DISTINCT a.consultDate AS dateTime, a.consultType, c.campusName, a.appID
+    FROM Appointments a
+    JOIN campus c ON a.campID = c.campusID
+    JOIN consultationMedication cm ON a.appID = cm.appID
+    JOIN userInfo u ON a.UID = u.UID
+    JOIN consultSummary cs ON a.appID = cs.appID
+    WHERE a.UID = :UID AND a.status = 'Prescribed'
+    ORDER BY a.consultDate DESC";
+
 
 $stmt = $conn->prepare($query);
-$stmt->bindParam(':patientID', $patientID, PDO::PARAM_INT);
+$stmt->bindParam(':UID', $patientID, PDO::PARAM_INT);
 $stmt->execute();
 $consultations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -22,12 +27,20 @@ $consultations = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <title>Consultation History</title>
   <link rel="stylesheet" href="../Stylesheet/summ.css"/>
   <script src="https://kit.fontawesome.com/503ea13a85.js" crossorigin="anonymous"></script>
+  <style>
+    h2{
+        margin-left: 60px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+  </style>
 </head>
 
 <body>
 <div class="sidebar">
     <a href="reqConsult.php"><i class="fa-solid fa-notes-medical fa-3x" title="Request Consultation"></i></a>
     <a href="viewSum.php"><i class="fa-solid fa-clock-rotate-left fa-3x" title="History"></i></a>
+    <a href="upcoming.php"><i class="fa-regular fa-calendar-xmark fa-3x" title="Appointments"></i></a>
 </div>
 
 <div class="container">    
@@ -37,7 +50,7 @@ $consultations = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <a href="#" class="active">Consultation</a>
     </nav>
     <br>
-    <h1><strong>History</strong></h1>
+    <h2>History</h2>
     <table>
       <thead>
         <tr>
@@ -51,9 +64,9 @@ $consultations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php foreach ($consultations as $row): ?>
           <tr>
             <td><?= htmlspecialchars($row['dateTime']) ?></td>
-            <td><?= htmlspecialchars($row['consultationType']) ?></td>
-            <td><?= htmlspecialchars($row['campus']) ?></td>
-            <td><a href="#" class="view-summary" data-id="<?= $row['consultID'] ?>">View</a></td>
+            <td><?= htmlspecialchars($row['consultType']) ?></td>
+            <td><?= htmlspecialchars($row['campusName']) ?></td>
+            <td><a href="#" class="view-summary" data-id="<?= $row['appID'] ?>">View</a></td>
           </tr>
         <?php endforeach; ?>
       </tbody>
@@ -72,7 +85,7 @@ $consultations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
   </div>
 </div>
-<script src="../JScripts/index.js"></script>
+<script src="../JScripts/patient.js"></script>
 </body>
 </html>
 
